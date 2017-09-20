@@ -1,0 +1,50 @@
+# Store API configuration for development environment
+
+# Server configuration
+server:
+    port: 8080
+
+# Database/ORM configuration
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/store
+        username: store
+        password: secret
+        testWhileIdle: true
+        validationQuery: SELECT 1
+    jpa:
+        show-sql: false
+        hibernate:
+            ddl-auto: validate
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL5Dialect
+
+# CORS configuration
+cors:
+    origin-allowed: http://localhost
+    max-age: 3600
+
+# oAuth2 configuration
+oauth2:
+    jwt:
+        hmac-key: 7w!z%C*F-JaNdRgUkXp2s5u8x/A?D(G+
+    token:
+        access:
+            validity: 300
+        refresh:
+            validity: 1209600
+    clients:
+        -
+          id: webapp
+          secret: mei6bai0Aimeiwe2aegheebohnoh1U
+          resource: store-api
+          name: WebApp
+          scopes:
+            - read
+            - write
+          grant-types:
+            - password
+            - refresh_token
+          access-token-validity: 300
+          refresh-token-validity: 1209600

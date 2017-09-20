@@ -1,0 +1,9 @@
+# Gradle files and directories to exclude
+.gradle/
+build/
+
+# IntelliJ (JetBreans IDE) files and directories to exclude
+.idea/
+
+# Mac OS X Desktop Services Store files to exclude
+**/.DS_Store

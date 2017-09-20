@@ -1,0 +1,20 @@
+# Store API configuration
+server:
+    display-name: Store API v0.1
+    context-path: /api/v0.1
+
+# CORS configuration
+cors:
+    methods-allowed: GET, POST, PUT, DELETE, OPTIONS
+    headers-allowed: Origin, Content-Type, Accept, X-Requested-With, Authorization, X-Auth-Token
+    allow-credentials: true
+
+# oAuth2 configuration
+oauth2:
+    resource-id: store-api
+
+# Spring profiles configuration
+spring:
+    profiles:
+        active: prod
+
