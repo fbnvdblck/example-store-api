@@ -15,26 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package be.bulck.example.store.api;
+package be.bulck.example.store.api.dto;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import be.bulck.example.store.api.domain.Product;
 
 /**
- * The entry point to access to Store API.
+ * The Data Transfer Object (DTO) for Product entity.
  *
  * @author Fabien Vanden Bulck
  */
-@SpringBootApplication
-public class StoreApiApplication {
-  public static void main(String[] args) {
-    SpringApplication.run(StoreApiApplication.class, args);
-  }
-
-  @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
-  }
+public class ProductDto extends Product {
 }

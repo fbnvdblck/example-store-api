@@ -1,0 +1,197 @@
+/*
+ * Copyright (C) 2017 The Store API Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.DumperOptions
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: 'org.yaml', name: 'snakeyaml', version: '1.18'
+    }
+}
+
+configurations {
+    liquibase
+}
+
+dependencies {
+    liquibase group: 'org.liquibase.ext', name: 'liquibase-hibernate5', version: '3.6'
+}
+
+// Task: Gets the status of database migration
+task databaseStatus(type: JavaExec) {
+    group = "database"
+    description = "Gets the status of database migration"
+
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.liquibase
+    main = "liquibase.integration.commandline.Main"
+
+    LiquibaseConfiguration liquibaseConfiguration = getLiquibaseConfiguration()
+    DatabaseConfiguration databaseConfiguration = getDatabaseConfiguration()
+
+    args "--changeLogFile=" + liquibaseConfiguration.changeLogPath + "/db.changelog-master.yaml"
+    args "--url=" + databaseConfiguration.url
+    args "--driver=" + databaseConfiguration.driver
+    args "--username=" + databaseConfiguration.username
+    args "--password=" + databaseConfiguration.password
+    args "status"
+    args "--verbose"
+}
+
+// Task: Validates change logs to ensure they can be used
+task databaseValidate(type: JavaExec) {
+    group = "database"
+    description = "Validates change logs to ensure they can be used"
+
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.liquibase
+    main = "liquibase.integration.commandline.Main"
+
+    LiquibaseConfiguration liquibaseConfiguration = getLiquibaseConfiguration()
+    DatabaseConfiguration databaseConfiguration = getDatabaseConfiguration()
+
+    args "--changeLogFile=" + liquibaseConfiguration.changeLogPath + "/db.changelog-master.yaml"
+    args "--url=" + databaseConfiguration.url
+    args "--driver=" + databaseConfiguration.driver
+    args "--username=" + databaseConfiguration.username
+    args "--password=" + databaseConfiguration.password
+    args "validate"
+}
+
+// Task: Updates the database based on change logs and database history
+task databaseUpdate(type: JavaExec) {
+    group = "database"
+    description = "Updates the database based on change logs and database history"
+
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.liquibase
+    main = "liquibase.integration.commandline.Main"
+
+    LiquibaseConfiguration liquibaseConfiguration = getLiquibaseConfiguration()
+    DatabaseConfiguration databaseConfiguration = getDatabaseConfiguration()
+
+    args "--changeLogFile=" + liquibaseConfiguration.changeLogPath + "/db.changelog-master.yaml"
+    args "--url=" + databaseConfiguration.url
+    args "--driver=" + databaseConfiguration.driver
+    args "--username=" + databaseConfiguration.username
+    args "--password=" + databaseConfiguration.password
+    args "update"
+}
+
+// Task: Generates a change log from differences between a database and persistance entities
+task databaseDiff(type: JavaExec) {
+    group = "database"
+    description = "Generates a change log from differences between a database and persistance entities"
+
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.liquibase
+    main = "liquibase.integration.commandline.Main"
+
+    LiquibaseConfiguration liquibaseConfiguration = getLiquibaseConfiguration()
+    DatabaseConfiguration databaseConfiguration = getDatabaseConfiguration()
+
+    args "--changeLogFile=" + liquibaseConfiguration.changeLogPath + "/" + buildChangeLogName(liquibaseConfiguration)
+    args "--referenceUrl=hibernate:spring:" + liquibaseConfiguration.hibernatePackage + "?dialect=" + databaseConfiguration.hibernateDialect
+    args "--url=" + databaseConfiguration.url
+    args "--driver=" + databaseConfiguration.driver
+    args "--username=" + databaseConfiguration.username
+    args "--password=" + databaseConfiguration.password
+    args "diffChangeLog"
+}
+
+LiquibaseConfiguration getLiquibaseConfiguration() {
+    final String configurationFilePath = "src/main/resources/db/liquibase.yml"
+
+    DumperOptions options = new DumperOptions();
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+    Yaml yaml = new Yaml(options)
+
+    Map liquibaseConfigurationMap = (Map) yaml.load(new File(configurationFilePath).text)
+    if (liquibaseConfigurationMap == null) {
+        throw new StopExecutionException(confirationFilePath + " is not readable")
+    }
+
+    LiquibaseConfiguration liquibaseConfiguration = new LiquibaseConfiguration()
+    liquibaseConfiguration.changeLogPath = liquibaseConfigurationMap["liquibase"]["changelog"]["path"]
+    liquibaseConfiguration.hibernatePackage = liquibaseConfigurationMap["liquibase"]["hibernate"]["package"]
+    liquibaseConfiguration.filePrefix = liquibaseConfigurationMap["liquibase"]["changelog"]["file"]["format"]["prefix"]
+    liquibaseConfiguration.fileDateFormat = liquibaseConfigurationMap["liquibase"]["changelog"]["file"]["format"]["date"]
+    liquibaseConfiguration.fileExtension = liquibaseConfigurationMap["liquibase"]["changelog"]["file"]["format"]["extension"]
+
+    return liquibaseConfiguration
+}
+
+DatabaseConfiguration getDatabaseConfiguration() {
+    final String mainAppConfigurationFilePath = "src/main/resources/application.yml"
+    final String appConfigurationFilesDirectoryPath = "src/main/resources";
+
+    DumperOptions options = new DumperOptions();
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+    Yaml yaml = new Yaml(options)
+
+    Map mainAppConfigurationMap = (Map) yaml.load(new File(mainAppConfigurationFilePath).text)
+    if (mainAppConfigurationMap == null) {
+        throw new StopExecutionException(mainAppConfigurationFilePath + " is not readable")
+    }
+
+    DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration()
+    databaseConfiguration.environment = mainAppConfigurationMap["spring"]["profiles"]["active"]
+
+    Map activeAppConfigurationMap = (Map) yaml.load(new File(appConfigurationFilesDirectoryPath + "/application-" +
+            databaseConfiguration.environment + ".yml").text)
+    if (activeAppConfigurationMap == null) {
+        throw new StopExecutionException(appConfigurationFilesDirectoryPath + "/application-" +
+                databaseConfiguration.environment + ".yml is not readable")
+    }
+
+    databaseConfiguration.url = activeAppConfigurationMap["spring"]["datasource"]["url"]
+    databaseConfiguration.username = activeAppConfigurationMap["spring"]["datasource"]["username"]
+    databaseConfiguration.password = activeAppConfigurationMap["spring"]["datasource"]["password"]
+    databaseConfiguration.driver = activeAppConfigurationMap["spring"]["datasource"]["driver"]
+    databaseConfiguration.hibernateDialect = activeAppConfigurationMap["spring"]["jpa"]["properties"]["hibernate"]["dialect"]
+
+    return databaseConfiguration
+}
+
+def buildChangeLogName(LiquibaseConfiguration configuration) {
+    Date todayDate = new Date()
+    String todayDateFormatted = todayDate.format(configuration.fileDateFormat)
+
+    return configuration.filePrefix + "-" + todayDateFormatted + "." + configuration.fileExtension
+}
+
+class LiquibaseConfiguration {
+    String changeLogPath
+    String hibernatePackage
+    String filePrefix;
+    String fileDateFormat;
+    String fileExtension;
+}
+
+class DatabaseConfiguration {
+    String environment
+    String url
+    String username
+    String password
+    String driver
+    String hibernateDialect
+}

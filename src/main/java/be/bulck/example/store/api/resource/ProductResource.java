@@ -18,14 +18,22 @@
 package be.bulck.example.store.api.resource;
 
 import be.bulck.example.store.api.domain.Product;
+import be.bulck.example.store.api.dto.ProductCreationDto;
+import be.bulck.example.store.api.dto.ProductDto;
+import be.bulck.example.store.api.dto.ProductUpdateDto;
 import be.bulck.example.store.api.service.ProductService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * The resource for product entity.
@@ -38,9 +46,64 @@ public class ProductResource {
   @Autowired
   private ProductService productService;
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @Autowired
+  private ModelMapper modelMapper;
+
+  @RequestMapping(method = RequestMethod.GET)
   @PreAuthorize("hasAuthority('PERM_READ_PRODUCT')")
-  public List<Product> getProducts() {
-    return productService.findAll();
+  public ResponseEntity<?> getProducts() {
+    Collection<Product> products = productService.findAll();
+
+    Type listType = new TypeToken<Collection<ProductDto>>() {}.getType();
+    Collection<ProductDto> productDtos = modelMapper.map(products, listType);
+
+    return new ResponseEntity(productDtos, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+  @PreAuthorize("hasAuthority('PERM_READ_PRODUCT')")
+  public ResponseEntity<?> getProduct(@PathVariable("id") Long id) {
+    Product product = productService.find(id);
+
+    ProductDto productDto = modelMapper.map(product, ProductDto.class);
+
+    return new ResponseEntity(productDto, HttpStatus.OK);
+  }
+
+  @RequestMapping(method = RequestMethod.POST)
+  @PreAuthorize("hasAuthority('PERM_WRITE_PRODUCT')")
+  public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreationDto productDto) {
+    Product productToCreate = modelMapper.map(productDto, Product.class);
+
+    Product productCreated = productService.create(productToCreate);
+
+    return new ResponseEntity(productCreated, HttpStatus.CREATED);
+  }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+  @PreAuthorize("hasAuthority('PERM_WRITE_PRODUCT')")
+  public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @Valid @RequestBody ProductUpdateDto productDto) {
+    Product productToUpdate = modelMapper.map(productDto, Product.class);
+    productToUpdate.setId(id);
+
+    Product productUpdated = productService.update(productToUpdate);
+
+    return new ResponseEntity(productUpdated, HttpStatus.OK);
+  }
+
+  @RequestMapping(method = RequestMethod.DELETE)
+  @PreAuthorize("hasAuthority('PERM_WRITE_PRODUCT')")
+  public ResponseEntity<?> deleteProducts() {
+    productService.deleteAll();
+
+    return new ResponseEntity(HttpStatus.NO_CONTENT);
+  }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+  @PreAuthorize("hasAuthority('PERM_WRITE_PRODUCT')")
+  public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) {
+    productService.delete(id);
+
+    return new ResponseEntity(HttpStatus.NO_CONTENT);
   }
 }

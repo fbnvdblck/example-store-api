@@ -5,6 +5,8 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
+apply from: 'gradle/database.gradle'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -25,6 +27,9 @@ dependencies {
     compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2'
     compile group: 'org.springframework.security', name: 'spring-security-jwt'
     compile group: 'mysql', name: 'mysql-connector-java'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml'
+    compile group: 'org.modelmapper', name: 'modelmapper', version: '1.1.0'
+    compile group: 'org.liquibase', name: 'liquibase-core'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'

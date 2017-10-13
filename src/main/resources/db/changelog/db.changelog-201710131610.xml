@@ -1,0 +1,59 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet id="201710131610-1" author="fvandenbulck">
+        <insert tableName="user">
+            <column name="username" value="jdoe" />
+            <column name="email" value="jdoe@bulck.be" />
+            <column name="password" value="$2a$04$7F95.iU8yMHIvBOh3Nvk5.KTghohurXyALyN4pgyjnqSfogL6kP3y" /> <!-- pw: secret -->
+            <column name="first_name" value="John" />
+            <column name="last_name" value="Doe" />
+            <column name="enabled" valueBoolean="true" />
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="USER" />
+            <column name="label" value="Role for basic users" />
+            <column name="description" value="Role for basic authenticated users" />
+        </insert>
+        <insert tableName="permission">
+            <column name="name" value="READ_PRODUCT" />
+            <column name="label" value="Permission to access to products" />
+            <column name="description" value="Permission to access to products and read information about them" />
+        </insert>
+        <insert tableName="permission">
+            <column name="name" value="WRITE_PRODUCT" />
+            <column name="label" value="Permission to edit products" />
+            <column name="description" value="Permission to edit and delete products and their information" />
+        </insert>
+    </changeSet>
+    <changeSet id="201710131610-2" author="fvandenbulck">
+        <insert tableName="role_permission">
+            <column name="role_id" valueComputed="(SELECT role_id FROM role WHERE name = 'USER')" />
+            <column name="permission_id" valueComputed="(SELECT permission_id FROM permission WHERE name = 'READ_PRODUCT')" />
+        </insert>
+        <insert tableName="role_permission">
+            <column name="role_id" valueComputed="(SELECT role_id FROM role WHERE name = 'USER')" />
+            <column name="permission_id" valueComputed="(SELECT permission_id FROM permission WHERE name = 'WRITE_PRODUCT')" />
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" valueComputed="(SELECT user_id FROM user WHERE username = 'jdoe')" />
+            <column name="role_id" valueComputed="(SELECT role_id FROM role WHERE name = 'USER')" />
+        </insert>
+    </changeSet>
+    <changeSet id="201710131610-3" author="fvandenbulck">
+        <insert tableName="product">
+            <column name="name" value="Fries (1kg)" />
+            <column name="price" valueNumeric="1.29" />
+            <column name="description" value="Best meal ever after a hangover - Made in Belgium (no kidding)" />
+        </insert>
+        <insert tableName="product">
+            <column name="name" value="Cheese (250g)" />
+            <column name="price" valueNumeric="3.99" />
+            <column name="description" value="Be careful, it could damage your sense of smell - Made in France" />
+        </insert>
+        <insert tableName="product">
+            <column name="name" value="Poutine" />
+            <column name="price" value="7.43" />
+            <column name="description" value="Do not seem good to eat but actually that's wonderful as meal - Made in Quebec (Canada)" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

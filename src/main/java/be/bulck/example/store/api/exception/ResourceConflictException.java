@@ -15,26 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package be.bulck.example.store.api;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+package be.bulck.example.store.api.exception;
 
 /**
- * The entry point to access to Store API.
+ * The exception thrown when a resource is in conflict with an other resource.
  *
  * @author Fabien Vanden Bulck
  */
-@SpringBootApplication
-public class StoreApiApplication {
-  public static void main(String[] args) {
-    SpringApplication.run(StoreApiApplication.class, args);
+public class ResourceConflictException extends RuntimeException {
+  /**
+   * Constructs an instance of resource conflict exception.
+   *
+   * @param message the message
+   */
+  public ResourceConflictException(String message) {
+    super(message);
   }
 
-  @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
+  /**
+   * Constructs an instance of resource conflict exception.
+   *
+   * @param message the message
+   * @param cause the cause
+   */
+  public ResourceConflictException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

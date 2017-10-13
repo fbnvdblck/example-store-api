@@ -18,8 +18,10 @@
 package be.bulck.example.store.api.service;
 
 import be.bulck.example.store.api.domain.Product;
+import be.bulck.example.store.api.exception.ResourceConflictException;
+import be.bulck.example.store.api.exception.ResourceNotFoundException;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * The service for product entity.
@@ -30,16 +32,66 @@ public interface ProductService {
   /**
    * Finds all products.
    *
-   * @return a list containing all products
+   * @return a collection containing all products
    */
-  List<Product> findAll();
+  Collection<Product> findAll();
 
   /**
-   * Saves a product.
+   * Finds a product by identifier.
    *
-   * @param product the product to save
+   * @param id the identifier of product
    *
-   * @return the product saved
+   * @return the product with corresponding identifier
+   *
+   * @throws ResourceNotFoundException if the product can not be found
    */
-  Product save(Product product);
+  Product find(Long id);
+
+  /**
+   * Finds a product by name.
+   *
+   * @param name the name of product
+   *
+   * @return the product with corresponding name
+   *
+   * @throws ResourceNotFoundException if the product can not be found
+   */
+  Product findByName(String name);
+
+  /**
+   * Creates a product.
+   *
+   * @param product the product to create
+   *
+   * @return the product created
+   *
+   * @throws ResourceConflictException if a product already exists with the name provided
+   */
+  Product create(Product product);
+
+  /**
+   * Updates a product.
+   *
+   * @param product the product to update
+   *
+   * @return the product updated
+   *
+   * @throws ResourceNotFoundException if the product can not be found
+   * @throws ResourceConflictException if a product already exists with the name provided
+   */
+  Product update(Product product);
+
+  /**
+   * Deletes a product.
+   *
+   * @param id the identifier of product to delete
+   *
+   * @throws ResourceNotFoundException if the product to delete is not found
+   */
+  void delete(Long id);
+
+  /**
+   * Deletes all products.
+   */
+  void deleteAll();
 }

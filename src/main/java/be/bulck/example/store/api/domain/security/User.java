@@ -55,11 +55,11 @@ public class User implements Serializable, Comparable<User>, UserDetails {
   private String password;
 
   /** The first name of user. */
-  @Column(name = "firstname", nullable = false)
+  @Column(name = "first_name", nullable = false)
   private String firstName;
 
   /** The last name of user. */
-  @Column(name = "lastname", nullable = false)
+  @Column(name = "last_name", nullable = false)
   private String lastName;
 
   /** The authorization to be used of user. */

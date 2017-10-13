@@ -26,4 +26,7 @@ import org.springframework.data.repository.CrudRepository;
  * @author Fabien Vanden Bulck
  */
 public interface ProductRepository extends CrudRepository<Product, Long> {
+  Product findByName(String name);
+  
+  void deleteAll();
 }

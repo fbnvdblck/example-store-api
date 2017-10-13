@@ -12,6 +12,7 @@ spring:
         password: secret
         testWhileIdle: true
         validationQuery: SELECT 1
+        driver: com.mysql.jdbc.Driver
     jpa:
         show-sql: false
         hibernate:
@@ -46,5 +47,5 @@ oauth2:
           grant-types:
             - password
             - refresh_token
-          access-token-validity: 300
+          access-token-validity: 3600
           refresh-token-validity: 1209600

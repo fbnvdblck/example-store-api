@@ -1,0 +1,123 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="fvandenbulck" id="201710131545-1">
+        <createTable tableName="permission">
+            <column autoIncrement="true" name="permission_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="permissionPK"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="label" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-2">
+        <createTable tableName="product">
+            <column autoIncrement="true" name="product_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="productPK"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="DECIMAL(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-3">
+        <createTable tableName="role">
+            <column autoIncrement="true" name="role_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="rolePK"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="label" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-4">
+        <createTable tableName="role_permission">
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-5">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="user_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="userPK"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BIT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-6">
+        <createTable tableName="user_role">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-7">
+        <addPrimaryKey columnNames="role_id, permission_id" tableName="role_permission"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-8">
+        <addPrimaryKey columnNames="user_id, role_id" tableName="user_role"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-9">
+        <addUniqueConstraint columnNames="name" constraintName="UC_PERMISSIONNAME_COL" tableName="permission"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-10">
+        <addUniqueConstraint columnNames="name" constraintName="UC_PRODUCTNAME_COL" tableName="product"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-11">
+        <addUniqueConstraint columnNames="name" constraintName="UC_ROLENAME_COL" tableName="role"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-12">
+        <addUniqueConstraint columnNames="email" constraintName="UC_USEREMAIL_COL" tableName="user"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-13">
+        <addUniqueConstraint columnNames="username" constraintName="UC_USERUSERNAME_COL" tableName="user"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-14">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_role" constraintName="FK859n2jvi8ivhui0rl0esws6o" deferrable="false" initiallyDeferred="false" referencedColumnNames="user_id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-15">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_role" constraintName="FKa68196081fvovjhkek5m97n3y" deferrable="false" initiallyDeferred="false" referencedColumnNames="role_id" referencedTableName="role"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-16">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="role_permission" constraintName="FKa6jx8n8xkesmjmv6jqug6bg68" deferrable="false" initiallyDeferred="false" referencedColumnNames="role_id" referencedTableName="role"/>
+    </changeSet>
+    <changeSet author="fvandenbulck" id="201710131545-17">
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="role_permission" constraintName="FKf8yllw1ecvwqy3ehyxawqa1qp" deferrable="false" initiallyDeferred="false" referencedColumnNames="permission_id" referencedTableName="permission"/>
+    </changeSet>
+</databaseChangeLog>

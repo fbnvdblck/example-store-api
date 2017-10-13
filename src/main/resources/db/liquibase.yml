@@ -1,0 +1,11 @@
+liquibase:
+    hibernate:
+        package: be.bulck.example.store.api.domain
+        driver:
+    changelog:
+        path: src/main/resources/db/changelog
+        file:
+            format:
+                prefix: db.changelog
+                date: yyyyMMddHHmm
+                extension: xml
